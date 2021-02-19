@@ -9,6 +9,9 @@ from yellowbrick.model_selection import LearningCurve
 
 from utils import loadWineDataSet
 
+"""
+This method is used to load and analyze the wine data data set to cleanse it further for the classification problem
+"""
 def loadExploreDS():
     wds = loadWineDataSet()
     ds_shape = wds.shape
@@ -42,6 +45,10 @@ def loadExploreDS():
     }
     return wineDict
 
+"""
+This method is used to convert the multicategory data into only two categories for simplification.
+"""
+
 def prepareDataForModelling(wineDF):
     features = wineDF.drop(['quality','goodquality'], axis=1)
     output = wineDF['goodquality']
@@ -59,7 +66,11 @@ def prepareDataForModelling(wineDF):
         "output": output
     }
 
-def performDecisionTreeAnalysis(data):
+"""
+This method is used to perform grid search analysis in order to find out the maximum depth for the decision tree to be used for prunning.
+"""
+
+def performgridSearch(data):
     x_train = data["X_train"]
     y_train = data["y_train"]
     x_test = data["X_test"]
@@ -94,12 +105,44 @@ def performDecisionTreeAnalysis(data):
     scores = cross_val_score(model, x_train, y_train, scoring='accuracy', cv=cv, n_jobs=-1)
     # perform grid search
     print('Accuracy: %.3f (%.3f)' % (mean(scores), std(scores)))
-    # model.fit(x_train, y_train)
-    # y_pred1 = model.predict(x_test)
-    #print(classification_report(y_test, y_pred1))
+
+"""
+This method is used for performing actual decision tree analysis on the data to generate the final results with hyper parameters
+obtained from grid search
+"""
+def analyzeDecisionTree(dataSet):
+    print('Calling analyze tree')
+    x_train = dataSet["X_train"]
+    y_train = dataSet["y_train"]
+    x_test = dataSet["X_test"]
+    y_test = dataSet["y_test"]
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # create model with hyper parameters obtained from grid search
+    model = DecisionTreeClassifier(random_state=1, max_depth=7)
+    model.fit(x_train, y_train)
+    y_pred1 = model.predict(x_test)
+    print(classification_report(y_test, y_pred1))
+    print('Done with analyze tree')
+
+    # Create the learning curve visualizer
+    cv = StratifiedKFold(n_splits=12)
+    sizes = linspace(0.3, 1.0, 10)
+    # Instantiate the classification model and visualizer
+    visualizer = LearningCurve(
+        model, cv=cv, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
+    )
+    visualizer.fit(dataSet["features"], dataSet["output"])  # Fit the data to the visualizer
+    visualizer.show()
+
+
+
+"""
+Main method to perform all the decision tree related tasks on the wine dataset.
+"""
 
 def performDecisionTree():
     winedict = loadExploreDS()
     dataset = winedict["dataSet"]
     preppedData = prepareDataForModelling(dataset)
-    performDecisionTreeAnalysis(preppedData)
+    performgridSearch(preppedData)
+    analyzeDecisionTree(preppedData)
