@@ -12,7 +12,7 @@ def loadExploreDataSet():
     ds_shape = bankds.shape
     columns = bankds.columns
     missingvals = bankds.isnull().sum()
-
+    print(bankds['deposit'].value_counts())
     bankdsinfo = {
         "dataset": bankds,
         "shape": ds_shape,

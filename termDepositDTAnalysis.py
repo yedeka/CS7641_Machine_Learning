@@ -1,7 +1,8 @@
+from matplotlib import axes
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
-from yellowbrick.model_selection import LearningCurve
+from yellowbrick.model_selection import LearningCurve, ValidationCurve
 
 import numpy as np
 
@@ -63,9 +64,9 @@ def performDecisionTreeTuned(features, output, test_population):
     # Aplly decision tree without any hyper parameter tuning
     model = DecisionTreeClassifier(max_leaf_nodes= 100, splitter='random')
     model.fit(x_train, y_train)
-    y_pred1 = model.predict(x_test)
+    y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
-    print(classification_report(y_test, y_pred1))
+    print(classification_report(y_test, y_pred))
     print("Tuned Data End ------------------------------------------------------------------")
     # Plotting the learning curve for the baseline model
     # Create the learning curve visualizer
@@ -77,6 +78,11 @@ def performDecisionTreeTuned(features, output, test_population):
     )
     visualizer.fit(features, output)  # Fit the data to the visualizer
     visualizer.show()
+
+    viz = ValidationCurve(model, param_name='max_leaf_nodes',
+                          param_range=[30,40,50,80,100,130,150,185,187,200,210,220], cv=10, scoring="r2")
+    viz.fit(features, output)
+    viz.show()
 
 def performDecisionTree():
     bankDS = loadExploreDataSet()
