@@ -1,8 +1,8 @@
-import termDepositAnalysis
+import termDepositDTAnalysis
 import wineQualityAnalysis
 
 def peformTermDepositExperiment():
-    termDepositAnalysis.performDecisionTree()
+    termDepositDTAnalysis.performDecisionTree()
 
 def performWineExperiment():
     wineQualityAnalysis.performDecisionTree()
