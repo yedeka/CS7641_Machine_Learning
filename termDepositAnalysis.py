@@ -1,3 +1,7 @@
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+
 from utils import loadBankDataSet
 
 import matplotlib.pyplot as plt
@@ -182,8 +186,45 @@ def clean_data(df):
 
     print('Columns After ')
     print(cleaned_df.columns)
-
     print(cleaned_df.head())
+    return cleaned_df
+
+'''
+Gather the baseline parameters for decision tree without any tuning and grid searching
+'''
+def performDecisionTreeBaseline(features, output, test_population):
+    # prepare data for splitting into training set and testing set
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
+    # Aplly decision tree without any hyper parameter tuning
+    model = DecisionTreeClassifier(max_leaf_nodes=189)
+    model.fit(x_train, y_train)
+    y_pred1 = model.predict(x_test)
+    print("Baseline Data Start ------------------------------------------------------------------")
+    print(classification_report(y_test, y_pred1))
+    print("Baseline Data End ------------------------------------------------------------------")
+
+'''
+perform grid search to find out the best hyperparameter to be used for tuning the decision tree
+'''
+def performGridSearch(features, output, testpopulation):
+    # prepare data for splitting into training set and testing set
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testpopulation)
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # create model
+    model = DecisionTreeClassifier()
+    # Perform grid search
+    param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220],'splitter': ["random"]}
+    # param_grid = {'max_depth': [2,3,4,5,6,7,8,9,10]}
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    # fitting the model for grid search
+    grid.fit(x_train, y_train)
+    print("Grid search Data Start ------------------------------------------------------------------")
+    # print best parameter after tuning
+    print(grid.best_params_)
+    grid_predictions = grid.predict(x_test)
+    # print classification report
+    print(grid.best_score_)
+    print("Grid search Data End ------------------------------------------------------------------")
 
 def performDecisionTree():
     bankDS = loadExploreDataSet()
@@ -192,4 +233,8 @@ def performDecisionTree():
     # plotNumClmns(dataset)
     # Cleanse the data by dropping irrelevant columns, imputing the noisy columns and converting truthy columns to corresponding binary values
     cleaned_data = clean_data(dataset)
-
+    features = cleaned_data.drop(['deposit_bool'], axis=1)
+    output = cleaned_data['deposit_bool']
+    test_population = 0.2
+    #performDecisionTreeBaseline(features, output, test_population)
+    performGridSearch(features, output, test_population)
