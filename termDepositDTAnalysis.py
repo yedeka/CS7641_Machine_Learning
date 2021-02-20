@@ -1,5 +1,4 @@
-from matplotlib import axes
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV, StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
 from yellowbrick.model_selection import LearningCurve, ValidationCurve
@@ -68,6 +67,10 @@ def performDecisionTreeTuned(features, output, test_population):
     print("Tuned Data Start ------------------------------------------------------------------")
     print(classification_report(y_test, y_pred))
     print("Tuned Data End ------------------------------------------------------------------")
+    print("Tuned Data Confusion Matrix ------------------------------------------------------------------")
+    cm = confusion_matrix(y_test, y_pred)
+    print(cm)
+    accuracy = float(cm.diagonal().sum()) / len(y_test)
     # Plotting the learning curve for the baseline model
     # Create the learning curve visualizer
     cv = StratifiedKFold(n_splits=12)

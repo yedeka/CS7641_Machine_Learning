@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-
 '''
 Function to load the data set and exploring the same with some initial dataset level basic stats
 '''
+
+
 def loadExploreDataSet():
     bankds = loadBankDataSet()
     ds_shape = bankds.shape
@@ -20,9 +21,12 @@ def loadExploreDataSet():
     }
     return bankdsinfo
 
+
 """
 Function to plot categorical data to understand the limits and outlisers for data cleansing    
 """
+
+
 def plotCatClmns(bankdf):
     category_clmns = ['contact', 'default', 'education', 'housing', 'job', 'loan', 'marital', 'month', 'poutcome']
     fig, axs = plt.subplots(3, 3, sharex=False, sharey=False, figsize=(30, 15))
