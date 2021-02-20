@@ -38,10 +38,10 @@ def performGridSearch(features, output, testpopulation):
     # create model
     model = AdaBoostClassifier()
     # Perform grid search
-    # param_grid = {'learning_rate':}
-    param_grid = {'n_estimators': [5, 10, 25, 50, 100, 150, 250], 'learning_rate':[0.25, 0.3 , 0.4, 0.5, 0.75]}
-    svc = SVC(probability=True, kernel='linear')
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    param_grid = {'n_estimators': range(100,2500,100), 'learning_rate':[0.0001,0.001,0.01,0.1,0.5,0.7]}
+    # svc = SVC(probability=True, kernel='linear')
+    # param_grid = {'n_estimators': range(100, 2100, 100)}
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=20)
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -56,7 +56,7 @@ def performBoostingTuned(features, output, test_population):
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
     # Aplly decision tree without any hyper parameter tuning
-    model = AdaBoostClassifier(n_estimators=250, learning_rate=0.5)
+    model = AdaBoostClassifier(n_estimators=300, learning_rate=0.5)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -92,5 +92,5 @@ def performBoosting():
     output = cleaned_data['deposit_bool']
     test_population = 0.2
     performBoostingBaseline(features, output, test_population)
-    performGridSearch(features, output, test_population)
+    #performGridSearch(features, output, test_population)
     performBoostingTuned(features, output, test_population)
