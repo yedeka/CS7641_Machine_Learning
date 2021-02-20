@@ -56,7 +56,8 @@ def performBoostingTuned(features, output, test_population):
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
     # Aplly decision tree without any hyper parameter tuning
-    model = AdaBoostClassifier(n_estimators=300, learning_rate=0.5)
+    # model = AdaBoostClassifier(n_estimators=300, learning_rate=0.5)
+    model = AdaBoostClassifier(n_estimators=1400, learning_rate=0.1)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -77,9 +78,11 @@ def performBoostingTuned(features, output, test_population):
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
+    ''' viz = ValidationCurve(model, param_name='n_estimators',
+                          param_range=[5, 10, 25, 50, 100, 150, 250], cv=10, scoring="r2")'''
     viz = ValidationCurve(model, param_name='n_estimators',
-                          param_range=[5, 10, 25, 50, 100, 150, 250], cv=10, scoring="r2")
-    viz.fit(features, output)
+                          param_range=[1200,1250,1300,1400,1500,1550,1600], cv=10, scoring="r2")
+    viz.fit(x_train, y_train)
     viz.show()
 
 
@@ -91,6 +94,6 @@ def performBoosting():
     features = cleaned_data.drop(['deposit_bool'], axis=1)
     output = cleaned_data['deposit_bool']
     test_population = 0.2
-    performBoostingBaseline(features, output, test_population)
+    #performBoostingBaseline(features, output, test_population)
     #performGridSearch(features, output, test_population)
     performBoostingTuned(features, output, test_population)
