@@ -81,7 +81,7 @@ def performKNNTuned(features, output, test_population):
 
     viz = ValidationCurve(model, param_name='n_neighbors',
                           param_range=[55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70], cv=10, scoring="r2")
-    viz.fit(features, output)
+    viz.fit(x_train, y_train)
     viz.show()
 
 def performKNN():
@@ -91,6 +91,6 @@ def performKNN():
     features = cleaned_data.drop(['deposit_bool'], axis=1)
     output = cleaned_data['deposit_bool']
     test_population = 0.2
-    #performKNNBaseLine(features, output, test_population)
-    #performGridSearch(features, output, test_population)
+    performKNNBaseLine(features, output, test_population)
+    performGridSearch(features, output, test_population)
     performKNNTuned(features, output, test_population)

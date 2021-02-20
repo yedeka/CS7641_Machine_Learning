@@ -25,7 +25,7 @@ def performBoostingBaseline(features, output, test_population):
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
-    visualizer.fit(features, output)  # Fit the data to the visualizer
+    visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
 '''
@@ -74,7 +74,7 @@ def performBoostingTuned(features, output, test_population):
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
-    visualizer.fit(features, output)  # Fit the data to the visualizer
+    visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='n_estimators',

@@ -1,12 +1,14 @@
 import termDepositDTAnalysis
 import termDepositBoostingAnalysis
 import termDepositKnnAnalysis
+import termDepositSVMAnalysis
 import wineQualityDTAnalysis
 
 def peformTermDepositExperiment():
     # termDepositDTAnalysis.performDecisionTree()
     # termDepositBoostingAnalysis.performBoosting()
-    termDepositKnnAnalysis.performKNN()
+    # termDepositKnnAnalysis.performKNN()
+    termDepositSVMAnalysis.performSVM()
 
 ''' def performWineExperiment():
     wineQualityDTAnalysis.performDecisionTree() '''
