@@ -1,11 +1,13 @@
 import termDepositDTAnalysis
-import wineQualityAnalysis
+import termDepositBoostingAnalysis
+import wineQualityDTAnalysis
 
 def peformTermDepositExperiment():
-    termDepositDTAnalysis.performDecisionTree()
+    # termDepositDTAnalysis.performDecisionTree()
+    termDepositBoostingAnalysis.performBoosting()
 
-def performWineExperiment():
-    wineQualityAnalysis.performDecisionTree()
+''' def performWineExperiment():
+    wineQualityDTAnalysis.performDecisionTree() '''
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

@@ -1,17 +1,20 @@
-from sklearn.ensemble import AdaBoostClassifier
+import matplotlib
+from numpy import mean, std, linspace
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV, StratifiedKFold
-from sklearn.svm import SVC
-from yellowbrick.model_selection import LearningCurve, ValidationCurve
+from sklearn.model_selection import train_test_split, KFold, cross_val_score, RepeatedKFold, GridSearchCV, StratifiedKFold
+from sklearn.tree import DecisionTreeClassifier
+from yellowbrick.model_selection import LearningCurve
 
-import numpy as np
-from termDepositUtil import loadExploreDataSet, clean_data
+from wineQualityUtil import loadExploreDS, prepareDataForModelling
+'''
+This method is used to perform decision tree learning to get the baseline scores for the model
+'''
 
-def performBoostingBaseline(features, output, test_population):
+def performDecisionTreeBaseline(features, output, test_population):
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
-    # Create adaboost classifer object
-    model = AdaBoostClassifier()
+    # Aplly decision tree without any hyper parameter tuning
+    model = DecisionTreeClassifier()
     model.fit(x_train, y_train)
     y_pred1 = model.predict(x_test)
     print("Baseline Data Start ------------------------------------------------------------------")
@@ -20,43 +23,54 @@ def performBoostingBaseline(features, output, test_population):
     # Plotting the learning curve for the baseline model
     # Create the learning curve visualizer
     cv = StratifiedKFold(n_splits=12)
-    sizes = np.linspace(0.3, 1.0, 10)
+    sizes = linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
+        model, cv=cv, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
+    )
+    visualizer.fit(features, output)  # Fit the data to the visualizer
+    visualizer.show()
+
+
+"""
+This method is used to perform grid search analysis in order to find out the maximum depth for the decision tree to be used for prunning.
+"""
+
+def performgridSearch(features, output, testpopulation):
+    # prepare data for splitting into training set and testing set
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testpopulation)
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # create model
+    model = DecisionTreeClassifier()
+    # Perform grid search
+    param_grid = {'max_depth': [3, 5, 6, 7, 9, 10]}
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    # fitting the model for grid search
+    grid.fit(x_train, y_train)
+    # print best parameter after tuning
+    print(grid.best_params_)
+    grid_predictions = grid.predict(x_test)
+    # print classification report
+    print(classification_report)
+
+    # Create the learning curve visualizer
+    cv = StratifiedKFold(n_splits=12)
+    sizes = linspace(0.3, 1.0, 10)
+    # Instantiate the classification model and visualizer
+    visualizer = LearningCurve(
+        model, cv=cv, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
     )
     visualizer.fit(features, output)  # Fit the data to the visualizer
     visualizer.show()
 
 '''
-perform grid search to find out the best hyperparameter to be used for tuning the decision tree
+Find out the performance of the tuned model
 '''
-def performGridSearch(features, output, testpopulation):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testpopulation)
-    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-    # create model
-    model = AdaBoostClassifier()
-    # Perform grid search
-    # param_grid = {'learning_rate':}
-    param_grid = {'n_estimators': [5, 10, 25, 50, 100, 150, 250], 'learning_rate':[0.25, 0.3 , 0.4, 0.5, 0.75]}
-    svc = SVC(probability=True, kernel='linear')
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
-    # fitting the model for grid search
-    grid.fit(x_train, y_train)
-    print("Grid search Data Start ------------------------------------------------------------------")
-    # print best parameter after tuning
-    print(grid.best_params_)
-    grid_predictions = grid.predict(x_test)
-    # print classification report
-    print(grid.best_score_)
-    print("Grid search Data End ------------------------------------------------------------------")
-
-def performBoostingTuned(features, output, test_population):
+def performDecisionTreeTuned(features, output, test_population):
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
     # Aplly decision tree without any hyper parameter tuning
-    model = AdaBoostClassifier(n_estimators=250, learning_rate=0.5)
+    model = DecisionTreeClassifier(random_state=1, max_depth=7)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -69,7 +83,7 @@ def performBoostingTuned(features, output, test_population):
     # Plotting the learning curve for the baseline model
     # Create the learning curve visualizer
     cv = StratifiedKFold(n_splits=12)
-    sizes = np.linspace(0.3, 1.0, 10)
+    sizes = linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
@@ -77,20 +91,18 @@ def performBoostingTuned(features, output, test_population):
     visualizer.fit(features, output)  # Fit the data to the visualizer
     visualizer.show()
 
-    viz = ValidationCurve(model, param_name='n_estimators',
-                          param_range=[5, 10, 25, 50, 100, 150, 250], cv=10, scoring="r2")
-    viz.fit(features, output)
-    viz.show()
 
+"""
+Main method to perform all the decision tree related tasks on the wine dataset.
+"""
 
-
-def performBoosting():
-    bankDS = loadExploreDataSet()
-    dataset = bankDS["dataset"]
-    cleaned_data = clean_data(dataset)
-    features = cleaned_data.drop(['deposit_bool'], axis=1)
-    output = cleaned_data['deposit_bool']
+def performDecisionTree():
+    winedict = loadExploreDS()
+    dataset = winedict["dataSet"]
+    preppedData = prepareDataForModelling(dataset)
+    features = preppedData["features"]
+    output = preppedData['output']
     test_population = 0.2
-    performBoostingBaseline(features, output, test_population)
-    performGridSearch(features, output, test_population)
-    performBoostingTuned(features, output, test_population)
+    performDecisionTreeBaseline(features, output, test_population)
+    performgridSearch(features, output, test_population)
+    performDecisionTreeTuned(features, output, test_population)
