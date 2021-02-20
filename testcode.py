@@ -5,13 +5,10 @@ import termDepositSVMAnalysis
 import wineQualityDTAnalysis
 
 def peformTermDepositExperiment():
-    # termDepositDTAnalysis.performDecisionTree()
+    termDepositDTAnalysis.performDecisionTree()
     # termDepositBoostingAnalysis.performBoosting()
     # termDepositKnnAnalysis.performKNN()
-    termDepositSVMAnalysis.performSVM()
-
-''' def performWineExperiment():
-    wineQualityDTAnalysis.performDecisionTree() '''
+    # termDepositSVMAnalysis.performSVM()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ def performDecisionTreeBaseline(features, output, test_population):
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
     # Aplly decision tree without any hyper parameter tuning
-    model = DecisionTreeClassifier()
+    model = DecisionTreeClassifier(random_state=50)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Baseline Data Start ------------------------------------------------------------------")
@@ -39,10 +39,9 @@ def performGridSearch(features, output, testpopulation):
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testpopulation)
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # create model
-    model = DecisionTreeClassifier()
+    model = DecisionTreeClassifier(random_state=50)
     # Perform grid search
     param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220], 'splitter':['random']}
-    # param_grid = {'min_samples_leaf': [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],'splitter': ["random"]}
     grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
     # fitting the model for grid search
     grid.fit(x_train, y_train)
@@ -61,7 +60,7 @@ def performDecisionTreeTuned(features, output, test_population):
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
     # Aplly decision tree without any hyper parameter tuning
-    model = DecisionTreeClassifier(max_leaf_nodes= 100, splitter='random')
+    model = DecisionTreeClassifier(max_leaf_nodes= 80, splitter='random',random_state=50)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -82,7 +81,7 @@ def performDecisionTreeTuned(features, output, test_population):
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='max_leaf_nodes',
-                          param_range=[30,40,50,80,100,130,150,185,187,200,210,220], cv=10, scoring="r2")
+                          param_range=[30,40,50,80,100,120,140,160], cv=10, scoring="r2")
     viz.fit(features, output)
     viz.show()
 
