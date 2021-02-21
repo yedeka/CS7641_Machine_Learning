@@ -12,9 +12,7 @@ from termDepositUtil import loadExploreDataSet, clean_data
 Perform baseline analysis for SVM model
 '''
 
-def performSVMBaseLine(features, output, testPopulation):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
+def performSVMBaseLine(x_train, x_test, y_train, y_test):
     model = svm.SVC(random_state=42)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
@@ -34,9 +32,7 @@ def performSVMBaseLine(features, output, testPopulation):
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
-def performGridSearch(features, output, testPopulation):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
+def performGridSearch(x_train, x_test, y_train, y_test):
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # create model
     model = svm.SVC(random_state=42)
@@ -54,11 +50,10 @@ def performGridSearch(features, output, testPopulation):
     print(grid.best_score_)
     print("Grid search Data End ------------------------------------------------------------------")
 
-def performSVNTuned(features, output, test_population):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
+def performSVNTuned(x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
     model = svm.SVC(random_state=42,gamma=0.00001)
+    # model = svm.SVC(random_state=42, gamma=0.000008)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -92,6 +87,8 @@ def performSVM():
     features = cleaned_data.drop(['deposit_bool'], axis=1)
     output = cleaned_data['deposit_bool']
     test_population = 0.2
-    performSVMBaseLine(features, output, test_population)
-    performGridSearch(features, output, test_population)
-    performSVNTuned(features, output, test_population)
+    # prepare data for splitting into training set and testing set
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
+    performSVMBaseLine(x_train, x_test, y_train, y_test)
+    performGridSearch(x_train, x_test, y_train, y_test)
+    performSVNTuned(x_train, x_test, y_train, y_test)
