@@ -112,7 +112,7 @@ def plotNumClmns(bankdf):
 
     print(bankdf[['pdays', 'campaign', 'previous']].describe())
     print(len(bankdf[bankdf['pdays'] > 400]) / len(bankdf) * 100)
-    # 81% of values of pdays are -1 we should drop it since the significance of -1 is not known
+    # 74% of values of pdays are -1 we should drop it since the significance of -1 is not known
     print(len(bankdf[bankdf['pdays'] == -1]) / len(bankdf) * 100)
     # Analysis of campaign column
     print(len(bankdf[bankdf['campaign'] > 34]) / len(bankdf) * 100)
@@ -190,3 +190,8 @@ def clean_data(df):
     print(cleaned_df.columns)
     print(cleaned_df.head())
     return cleaned_df
+
+if __name__ == '__main__':
+    ds = loadExploreDataSet()
+    plotCatClmns(ds["dataset"])
+    plotNumClmns(ds["dataset"])

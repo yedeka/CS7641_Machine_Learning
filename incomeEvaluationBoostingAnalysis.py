@@ -1,3 +1,4 @@
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, RepeatedKFold, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
@@ -7,9 +8,9 @@ import incomeEvaluationUtil
 import numpy as np
 
 
-def performBaselineDT(x_train, x_test, y_train, y_test):
+def performBoostingBaseline(x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    model = DecisionTreeClassifier(random_state=120)
+    model = AdaBoostClassifier(random_state=120)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Baseline Data Start ------------------------------------------------------------------")
@@ -30,12 +31,10 @@ def performBaselineDT(x_train, x_test, y_train, y_test):
 def performGridSearch(x_train, x_test, y_train, y_test):
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # create model
-    model = DecisionTreeClassifier(random_state=120)
+    model = AdaBoostClassifier(random_state=120)
     # Perform grid search
-    # param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220]}
-    # param_grid = {'min_samples_leaf': [10,20,30,40,50,60,70,80,90,100]}
-    param_grid = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
-
+    param_grid = {'n_estimators': range(100, 3000, 100), 'learning_rate': [0.00001,0.0001, 0.001, 0.01, 0.1]}
+    # param_grid = {'n_estimators': range(100, 3000, 100)}
     grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
     # fitting the model for grid search
     grid.fit(x_train, y_train)
@@ -51,9 +50,9 @@ def performGridSearch(x_train, x_test, y_train, y_test):
 '''
 Find out the performance of the tuned model
 '''
-def performDecisionTreeTuned( x_train, x_test, y_train, y_test):
+def performBoostingTuned( x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    model = DecisionTreeClassifier(max_depth= 7, random_state=120)
+    model = AdaBoostClassifier(n_estimators= 1500, random_state=120)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -72,20 +71,20 @@ def performDecisionTreeTuned( x_train, x_test, y_train, y_test):
     visualizer.fit(x_train, y_train)
     visualizer.show()
 
-    viz = ValidationCurve(model, param_name='max_depth',
-                          param_range=[1,3,5,7,9], cv=10, scoring="r2")
+    viz = ValidationCurve(model, param_name='n_estimators',
+                          param_range=[1300,1400,1500,1600,1700], cv=10, scoring="r2")
     viz.fit(x_train, y_train)
     viz.show()
 
 
 
-def performDecisionTree():
+def performBoosting():
     incomeDF = incomeEvaluationUtil.loadExploreDS()
     features = incomeDF.drop(['income'], axis=1)
     output = incomeDF['income']
     testPopulation = 0.2
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
-    performBaselineDT(x_train, x_test, y_train, y_test)
+    performBoostingBaseline(x_train, x_test, y_train, y_test)
     performGridSearch(x_train, x_test, y_train, y_test)
-    performDecisionTreeTuned(x_train, x_test, y_train, y_test)
+    performBoostingTuned(x_train, x_test, y_train, y_test)
