@@ -10,9 +10,7 @@ import numpy as np
 This function performs the KNN classification without tuning to determine the baseline results for KNN classification
 '''
 
-def performKNNBaseLine(features, output, testPopulation):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
+def performKNNBaseLine( x_train, x_test, y_train, y_test):
     model = KNeighborsClassifier()
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
@@ -29,16 +27,14 @@ def performKNNBaseLine(features, output, testPopulation):
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
-    visualizer.fit(features, output)  # Fit the data to the visualizer
+    visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
 '''
 This function is used to perform grid search for KNN hyper parameters for tuning
 '''
 
-def performGridSearch(features, output, testPopulation):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
+def performGridSearch( x_train, x_test, y_train, y_test):
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # create model
     model = KNeighborsClassifier()
@@ -55,11 +51,9 @@ def performGridSearch(features, output, testPopulation):
     print(grid.best_score_)
     print("Grid search Data End ------------------------------------------------------------------")
 
-def performKNNTuned(features, output, test_population):
-    # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
+def performKNNTuned(x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    model = KNeighborsClassifier(n_neighbors=63,metric='manhattan')
+    model = KNeighborsClassifier(n_neighbors=31,metric='manhattan')
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -76,11 +70,11 @@ def performKNNTuned(features, output, test_population):
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
-    visualizer.fit(features, output)  # Fit the data to the visualizer
+    visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='n_neighbors',
-                          param_range=[55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70], cv=10, scoring="r2")
+                          param_range=[25,27,29,31,33,35,37], cv=10, scoring="r2")
     viz.fit(x_train, y_train)
     viz.show()
 
@@ -91,6 +85,8 @@ def performKNN():
     features = cleaned_data.drop(['deposit_bool'], axis=1)
     output = cleaned_data['deposit_bool']
     test_population = 0.2
-    performKNNBaseLine(features, output, test_population)
-    performGridSearch(features, output, test_population)
-    performKNNTuned(features, output, test_population)
+    # prepare data for splitting into training set and testing set
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
+    performKNNBaseLine(x_train, x_test, y_train, y_test)
+    performGridSearch(x_train, x_test, y_train, y_test)
+    performKNNTuned(x_train, x_test, y_train, y_test)
