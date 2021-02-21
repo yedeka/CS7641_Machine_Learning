@@ -21,7 +21,7 @@ def performBaselineDT(x_train, x_test, y_train, y_test):
     sizes = np.linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, train_sizes=sizes, n_jobs=4
+        model, cv=cv, train_sizes=sizes, n_jobs=4, scoring='accuracy'
     )
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
@@ -36,7 +36,7 @@ def performGridSearch(x_train, x_test, y_train, y_test):
     # param_grid = {'min_samples_leaf': [10,20,30,40,50,60,70,80,90,100]}
     param_grid = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
 
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1, scoring='accuracy')
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -73,7 +73,7 @@ def performDecisionTreeTuned( x_train, x_test, y_train, y_test):
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='max_depth',
-                          param_range=[1,3,5,7,9], cv=10, scoring="r2")
+                          param_range=[3,5,7,9,11], cv=10, scoring='accuracy')
     viz.fit(x_train, y_train)
     viz.show()
 

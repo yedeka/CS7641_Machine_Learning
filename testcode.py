@@ -11,27 +11,33 @@ import incomeEvaluationNeuralNetworkAnalysis
 import time
 
 def performIncomeExperiment():
-    #incomeEvaluationDTAnalysis.performDecisionTree()
+    dtStart = time.time()
+    incomeEvaluationDTAnalysis.performDecisionTree()
+    dtend = time.time()
+    print("Time for income evaluation KNN => ", dtend - dtStart)
     #incomeEvaluationBoostingAnalysis.performBoosting()
-    knnStart = time.time()
+    '''knnStart = time.time()
     incomeEvaluationKNNAnalysis.performKNN()
     knnend = time.time()
     print("Time for income evaluation KNN => ", knnend - knnStart)
     # incomeValidationSVMAnalysis.performSVM()
-    '''nnStart = time.time()
+    nnStart = time.time()
     incomeEvaluationNeuralNetworkAnalysis.performNN()
     nnend = time.time()
     print("Time for income evaluation Neural Network => ", nnend - nnStart)'''
 
 def peformTermDepositExperiment():
-     #termDepositDTAnalysis.performDecisionTree()
-     #termDepositBoostingAnalysis.performBoosting()
      nnStart = time.time()
+     termDepositDTAnalysis.performDecisionTree()
+     nnend = time.time()
+     print("Time for Term Deposit Decision Tree => ", nnend - nnStart)
+     #termDepositBoostingAnalysis.performBoosting()
+     '''nnStart = time.time()
      termDepositKnnAnalysis.performKNN()
      nnend = time.time()
      print("Time for Term Deposit KNN => ", nnend - nnStart)
      #termDepositSVMAnalysis.performSVM()
-     '''nnStart = time.time()
+     nnStart = time.time()
      termDepositNeuralNetworkAnalysis.performNN()
      nnend = time.time()
      print("Time for Term Deposit Neural Network => ",nnend-nnStart)'''

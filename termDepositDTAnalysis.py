@@ -24,7 +24,7 @@ def performDecisionTreeBaseline(x_train, x_test, y_train, y_test):
     sizes = np.linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
+        model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
@@ -38,7 +38,7 @@ def performGridSearch(x_train, x_test, y_train, y_test):
     model = DecisionTreeClassifier(random_state=50)
     # Perform grid search
     param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220], 'splitter':['random']}
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1, scoring='accuracy')
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -75,7 +75,7 @@ def performDecisionTreeTuned(x_train, x_test, y_train, y_test):
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='max_leaf_nodes',
-                          param_range=[70,100,130,160,190], cv=10, scoring="r2")
+                          param_range=[70,100,130,160,190], cv=10,  scoring='accuracy')
     viz.fit(x_train, y_train)
     viz.show()
 
@@ -91,6 +91,6 @@ def performDecisionTree():
     test_population = 0.2
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
-    performDecisionTreeBaseline( x_train, x_test, y_train, y_test)
-    performGridSearch( x_train, x_test, y_train, y_test)
+    #performDecisionTreeBaseline( x_train, x_test, y_train, y_test)
+    #performGridSearch( x_train, x_test, y_train, y_test)
     performDecisionTreeTuned( x_train, x_test, y_train, y_test)
