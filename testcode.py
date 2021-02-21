@@ -15,7 +15,10 @@ def performIncomeExperiment():
     #incomeEvaluationBoostingAnalysis.performBoosting()
     #incomeEvaluationKNNAnalysis.performKNN()
     # incomeValidationSVMAnalysis.performSVM()
+    nnStart = time.time()
     incomeEvaluationNeuralNetworkAnalysis.performNN()
+    nnend = time.time()
+    print("Time for income evaluation Neural Network => ", nnend - nnStart)
 
 def peformTermDepositExperiment():
      #termDepositDTAnalysis.performDecisionTree()
@@ -28,6 +31,6 @@ def peformTermDepositExperiment():
      print("Time for Term Deposit Neural Network => ",nnend-nnStart)
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    peformTermDepositExperiment()
-    #performIncomeExperiment()
+    #peformTermDepositExperiment()
+    performIncomeExperiment()
 

@@ -25,7 +25,7 @@ def performNNBaseLine(x_train, x_test, y_train, y_test):
     sizes = np.linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, train_sizes=sizes, n_jobs=4
+        model, cv=cv, train_sizes=sizes, n_jobs=4, scoring='accuracy'
     )
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
@@ -39,7 +39,7 @@ def performGridSearch(x_train, x_test, y_train, y_test):
     # param_grid = {'momentum': [0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01]}
     # param_grid = {'alpha': [0.0001, 0.05]}
     param_grid = {'activation':['identity', 'logistic', 'tanh','relu'], 'solver':['lbfgs', 'sgd','adam']}
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1, scoring='accuracy')
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -73,7 +73,7 @@ def performNNTuned(x_train, x_test, y_train, y_test):
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='activation',
-                          param_range=['identity', 'logistic', 'tanh'], cv=10, scoring="r2")
+                          param_range=['identity', 'logistic', 'tanh'], cv=10, scoring='accuracy')
     viz.fit(x_train, y_train)
     viz.show()
 
