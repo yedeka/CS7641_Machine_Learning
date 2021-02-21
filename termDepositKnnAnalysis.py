@@ -40,7 +40,7 @@ def performGridSearch( x_train, x_test, y_train, y_test):
     model = KNeighborsClassifier()
     # Perform grid search
     param_grid = {'n_neighbors':range(11,100), 'metric': ['euclidean', 'manhattan', 'minkowski']}
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1,scoring='accuracy')
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -53,7 +53,7 @@ def performGridSearch( x_train, x_test, y_train, y_test):
 
 def performKNNTuned(x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    model = KNeighborsClassifier(n_neighbors=31,metric='manhattan')
+    model = KNeighborsClassifier(n_neighbors=51,metric='manhattan')
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -74,7 +74,7 @@ def performKNNTuned(x_train, x_test, y_train, y_test):
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='n_neighbors',
-                          param_range=[25,27,29,31,33,35,37], cv=10, scoring="r2")
+                          param_range=[45,47,49,51,53,55,57], cv=10, scoring='accuracy')
     viz.fit(x_train, y_train)
     viz.show()
 
