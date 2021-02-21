@@ -1,18 +1,15 @@
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, RepeatedKFold, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 from yellowbrick.model_selection import LearningCurve, ValidationCurve
 
+import incomeEvaluationUtil
 import numpy as np
 
-from termDepositUtil import loadExploreDataSet, clean_data
 
-'''
-Gather the baseline parameters for decision tree without any tuning and grid searching
-'''
-def performDecisionTreeBaseline(x_train, x_test, y_train, y_test):
-    # Apply decision tree without any hyper parameter tuning
-    model = DecisionTreeClassifier(random_state=50)
+def performBaselineDT(x_train, x_test, y_train, y_test):
+    # Aplly decision tree without any hyper parameter tuning
+    model = DecisionTreeClassifier(random_state=120)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Baseline Data Start ------------------------------------------------------------------")
@@ -24,20 +21,21 @@ def performDecisionTreeBaseline(x_train, x_test, y_train, y_test):
     sizes = np.linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
+        model, cv=cv, train_sizes=sizes, n_jobs=4
     )
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
-'''
-perform grid search to find out the best hyperparameter to be used for tuning the decision tree
-'''
+
 def performGridSearch(x_train, x_test, y_train, y_test):
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # create model
-    model = DecisionTreeClassifier(random_state=50)
+    model = DecisionTreeClassifier(random_state=120)
     # Perform grid search
-    param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220], 'splitter':['random']}
+    # param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220]}
+    # param_grid = {'min_samples_leaf': [10,20,30,40,50,60,70,80,90,100]}
+    param_grid = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
+
     grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
     # fitting the model for grid search
     grid.fit(x_train, y_train)
@@ -49,12 +47,13 @@ def performGridSearch(x_train, x_test, y_train, y_test):
     print(grid.best_score_)
     print("Grid search Data End ------------------------------------------------------------------")
 
+
 '''
 Find out the performance of the tuned model
 '''
-def performDecisionTreeTuned(x_train, x_test, y_train, y_test):
+def performDecisionTreeTuned( x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    model = DecisionTreeClassifier(max_leaf_nodes= 130, splitter='random',random_state=50)
+    model = DecisionTreeClassifier(max_depth= 7, random_state=120)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -67,30 +66,26 @@ def performDecisionTreeTuned(x_train, x_test, y_train, y_test):
     # Plotting the learning curve for the baseline model
     cv = StratifiedKFold(n_splits=12)
     sizes = np.linspace(0.3, 1.0, 10)
-    # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
-    visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
+    visualizer.fit(x_train, y_train)
     visualizer.show()
 
-    viz = ValidationCurve(model, param_name='max_leaf_nodes',
-                          param_range=[70,100,130,160,190], cv=10, scoring="r2")
+    viz = ValidationCurve(model, param_name='max_depth',
+                          param_range=[1,3,5,7,9], cv=10, scoring="r2")
     viz.fit(x_train, y_train)
     viz.show()
 
+
+
 def performDecisionTree():
-    bankDS = loadExploreDataSet()
-    dataset = bankDS["dataset"]
-    # plotCatClmns(dataset)
-    # plotNumClmns(dataset)
-    # Cleanse the data by dropping irrelevant columns, imputing the noisy columns and converting truthy columns to corresponding binary values
-    cleaned_data = clean_data(dataset)
-    features = cleaned_data.drop(['deposit_bool'], axis=1)
-    output = cleaned_data['deposit_bool']
-    test_population = 0.2
+    incomeDF = incomeEvaluationUtil.loadExploreDS()
+    features = incomeDF.drop(['income'], axis=1)
+    output = incomeDF['income']
+    testPopulation = 0.2
     # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
-    performDecisionTreeBaseline( x_train, x_test, y_train, y_test)
-    performGridSearch( x_train, x_test, y_train, y_test)
-    performDecisionTreeTuned( x_train, x_test, y_train, y_test)
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
+    performBaselineDT(x_train, x_test, y_train, y_test)
+    performGridSearch(x_train, x_test, y_train, y_test)
+    performDecisionTreeTuned(x_train, x_test, y_train, y_test)

@@ -1,9 +1,9 @@
 import pandas as pd
 
-def loadWineDataSet():
-    dataset = pd.read_csv("./data/winequality-white.csv",";");
+def loadIncomeDataSet():
+    dataset = pd.read_csv("income_evaluation.csv");
     return dataset;
 
 def loadBankDataSet():
-    dataset = pd.read_csv("./data/bank.csv");
+    dataset = pd.read_csv("bank.csv");
     return dataset;

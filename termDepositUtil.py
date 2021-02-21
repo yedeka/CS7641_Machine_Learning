@@ -1,4 +1,3 @@
-from utils import loadBankDataSet
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -7,6 +6,9 @@ import pandas as pd
 Function to load the data set and exploring the same with some initial dataset level basic stats
 '''
 
+def loadBankDataSet():
+    dataset = pd.read_csv("bank.csv");
+    return dataset
 
 def loadExploreDataSet():
     bankds = loadBankDataSet()
