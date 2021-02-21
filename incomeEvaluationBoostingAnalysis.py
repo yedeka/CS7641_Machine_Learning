@@ -1,18 +1,19 @@
-from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split, RepeatedKFold, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, RepeatedKFold, GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
 from yellowbrick.model_selection import LearningCurve, ValidationCurve
 
+import incomeEvaluationUtil
 import numpy as np
-from termDepositUtil import loadExploreDataSet, clean_data
 
-def performBoostingBaseline(x_train, x_test, y_train, y_test):
-    # Create adaboost classifer object
-    model = AdaBoostClassifier(random_state=45)
+
+def performBaselineDT(x_train, x_test, y_train, y_test):
+    # Aplly decision tree without any hyper parameter tuning
+    model = DecisionTreeClassifier(random_state=120)
     model.fit(x_train, y_train)
-    y_pred1 = model.predict(x_test)
+    y_pred = model.predict(x_test)
     print("Baseline Data Start ------------------------------------------------------------------")
-    print(classification_report(y_test, y_pred1))
+    print(classification_report(y_test, y_pred))
     print("Baseline Data End ------------------------------------------------------------------")
     # Plotting the learning curve for the baseline model
     # Create the learning curve visualizer
@@ -20,24 +21,22 @@ def performBoostingBaseline(x_train, x_test, y_train, y_test):
     sizes = np.linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
+        model, cv=cv, train_sizes=sizes, n_jobs=4
     )
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
-'''
-perform grid search to find out the best hyperparameter to be used for tuning the decision tree
-'''
+
 def performGridSearch(x_train, x_test, y_train, y_test):
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # create model
-    model = AdaBoostClassifier(random_state=45)
+    model = DecisionTreeClassifier(random_state=120)
     # Perform grid search
-    param_grid = {'n_estimators': range(100,3000,100), 'learning_rate':[0.0001,0.001,0.01,0.1,0.5,0.7]}
-    # param_grid = {'n_estimators': range(100, 3000, 100)}
-    # svc = SVC(probability=True, kernel='linear')
-    # param_grid = {'n_estimators': range(100, 2100, 100)}
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=20)
+    # param_grid = {'max_leaf_nodes': [30,40,50,80,100,130,150,185,187,200,210,220]}
+    # param_grid = {'min_samples_leaf': [10,20,30,40,50,60,70,80,90,100]}
+    param_grid = {'max_depth': [1,2,3,4,5,6,7,8,9,10]}
+
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -48,11 +47,13 @@ def performGridSearch(x_train, x_test, y_train, y_test):
     print(grid.best_score_)
     print("Grid search Data End ------------------------------------------------------------------")
 
-def performBoostingTuned(x_train, x_test, y_train, y_test):
+
+'''
+Find out the performance of the tuned model
+'''
+def performDecisionTreeTuned( x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    # model = AdaBoostClassifier(n_estimators=300, learning_rate=0.5)
-    # model = AdaBoostClassifier(n_estimators=1400, learning_rate=0.1)
-    model = AdaBoostClassifier(n_estimators=2200, learning_rate=0.1,random_state=45)
+    model = DecisionTreeClassifier(max_depth= 7, random_state=120)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
     print("Tuned Data Start ------------------------------------------------------------------")
@@ -63,33 +64,28 @@ def performBoostingTuned(x_train, x_test, y_train, y_test):
     print(cm)
     accuracy = float(cm.diagonal().sum()) / len(y_test)
     # Plotting the learning curve for the baseline model
-    # Create the learning curve visualizer
     cv = StratifiedKFold(n_splits=12)
     sizes = np.linspace(0.3, 1.0, 10)
-    # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
         model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
-    visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
+    visualizer.fit(x_train, y_train)
     visualizer.show()
 
-    viz = ValidationCurve(model, param_name='n_estimators',
-                          param_range=[2000,2100,2200,2300,2400], cv=10, scoring="r2")
-    '''viz = ValidationCurve(model, param_name='n_estimators',
-                          param_range=[100,120,140,160,180,200,220,240,260,300], cv=10, scoring="r2")'''
+    viz = ValidationCurve(model, param_name='max_depth',
+                          param_range=[1,3,5,7,9], cv=10, scoring="r2")
     viz.fit(x_train, y_train)
     viz.show()
 
 
-def performBoosting():
-    bankDS = loadExploreDataSet()
-    dataset = bankDS["dataset"]
-    cleaned_data = clean_data(dataset)
-    features = cleaned_data.drop(['deposit_bool'], axis=1)
-    output = cleaned_data['deposit_bool']
-    test_population = 0.2
+
+def performDecisionTree():
+    incomeDF = incomeEvaluationUtil.loadExploreDS()
+    features = incomeDF.drop(['income'], axis=1)
+    output = incomeDF['income']
+    testPopulation = 0.2
     # prepare data for splitting into training set and testing set
-    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
-    # performBoostingBaseline(x_train, x_test, y_train, y_test)
-    # performGridSearch(x_train, x_test, y_train, y_test)
-    performBoostingTuned(x_train, x_test, y_train, y_test)
+    x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
+    performBaselineDT(x_train, x_test, y_train, y_test)
+    performGridSearch(x_train, x_test, y_train, y_test)
+    performDecisionTreeTuned(x_train, x_test, y_train, y_test)

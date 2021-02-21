@@ -10,8 +10,8 @@ def performIncomeExperiment():
     incomeEvaluationDTAnalysis.performDecisionTree()
 
 def peformTermDepositExperiment():
-     termDepositDTAnalysis.performDecisionTree()
-     #termDepositBoostingAnalysis.performBoosting()
+     #termDepositDTAnalysis.performDecisionTree()
+     termDepositBoostingAnalysis.performBoosting()
      #termDepositKnnAnalysis.performKNN()
      #termDepositSVMAnalysis.performSVM()
 
