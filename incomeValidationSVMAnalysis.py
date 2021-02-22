@@ -93,6 +93,6 @@ def performSVM():
     testPopulation = 0.2
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
-    #performSVMBaseLine(x_train, x_test, y_train, y_test)
-    #performGridSearch(x_train, x_test, y_train, y_test)
+    performSVMBaseLine(x_train, x_test, y_train, y_test)
+    performGridSearch(x_train, x_test, y_train, y_test)
     performSVNTuned(x_train, x_test, y_train, y_test)

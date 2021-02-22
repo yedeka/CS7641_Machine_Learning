@@ -78,6 +78,6 @@ def performKNN():
     testPopulation = 0.2
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=testPopulation)
-    #performKNNBaseline(x_train, x_test, y_train, y_test)
-    #performGridSearch(x_train, x_test, y_train, y_test)
+    performKNNBaseline(x_train, x_test, y_train, y_test)
+    performGridSearch(x_train, x_test, y_train, y_test)
     performKNNTuned(x_train, x_test, y_train, y_test)

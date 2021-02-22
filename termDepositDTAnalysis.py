@@ -91,6 +91,6 @@ def performDecisionTree():
     test_population = 0.2
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
-    #performDecisionTreeBaseline( x_train, x_test, y_train, y_test)
-    #performGridSearch( x_train, x_test, y_train, y_test)
+    performDecisionTreeBaseline( x_train, x_test, y_train, y_test)
+    performGridSearch( x_train, x_test, y_train, y_test)
     performDecisionTreeTuned( x_train, x_test, y_train, y_test)

@@ -28,24 +28,6 @@ def performNNBaseLine(x_train, x_test, y_train, y_test):
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
 
-'''def performGridSearch(x_train, x_test, y_train, y_test):
-    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-    # create model
-    model = MLPClassifier(random_state = 50)
-    # Perform grid search
-    # param_grid = {'momentum': [0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.01]}
-    param_grid = {'alpha': [0.0001, 0.05]}
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
-    # fitting the model for grid search
-    grid.fit(x_train, y_train)
-    print("Grid search Data Start ------------------------------------------------------------------")
-    # print best parameter after tuning
-    print(grid.best_params_)
-    grid_predictions = grid.predict(x_test)
-    # print classification report
-    print(grid.best_score_)
-    print("Grid search Data End ------------------------------------------------------------------") '''
-
 def performGridSearch(x_train, x_test, y_train, y_test):
     print("Performing grid search")
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
