@@ -27,7 +27,7 @@ def performSVMBaseLine(x_train, x_test, y_train, y_test):
     sizes = np.linspace(0.3, 1.0, 10)
     # Instantiate the classification model and visualizer
     visualizer = LearningCurve(
-        model, cv=cv, scoring='f1_weighted', train_sizes=sizes, n_jobs=4
+        model, cv=cv, scoring='accuracy', train_sizes=sizes, n_jobs=4
     )
     visualizer.fit(x_train, y_train)  # Fit the data to the visualizer
     visualizer.show()
@@ -39,7 +39,7 @@ def performGridSearch(x_train, x_test, y_train, y_test):
     # Perform grid search
     # param_grid = {'gamma': [0.00001,0.00002,0.00003,0.00004,0.00005,0.00006,0.00007,0.00008,0.00009,0.0001]}
     param_grid = {'gamma': [0.000001, 0.000002, 0.000003, 0.000004, 0.000005, 0.000006, 0.000007, 0.000008, 0.000009, 0.00001]}
-    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1)
+    grid = GridSearchCV(model, param_grid, refit=True, verbose=3, n_jobs=-1,scoring='accuracy')
     # fitting the model for grid search
     grid.fit(x_train, y_train)
     print("Grid search Data Start ------------------------------------------------------------------")
@@ -52,7 +52,8 @@ def performGridSearch(x_train, x_test, y_train, y_test):
 
 def performSVNTuned(x_train, x_test, y_train, y_test):
     # Aplly decision tree without any hyper parameter tuning
-    model = svm.SVC(random_state=42,gamma=0.00001)
+    #model = svm.SVC(random_state=42,gamma=0.00001)
+    model = svm.SVC(random_state=42, gamma=0.000004)
     # model = svm.SVC(random_state=42, gamma=0.000008)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test)
@@ -74,8 +75,8 @@ def performSVNTuned(x_train, x_test, y_train, y_test):
     visualizer.show()
 
     viz = ValidationCurve(model, param_name='gamma',
-                          param_range=[0.000008, 0.000009,0.00001,0.00002,0.00003], cv=10,
-                          scoring="r2")
+                          param_range=[0.000002, 0.000003,0.000004,0.000005,0.000006], cv=10,
+                          scoring="accuracy")
     viz.fit(x_train, y_train)
     viz.show()
 
@@ -89,6 +90,6 @@ def performSVM():
     test_population = 0.2
     # prepare data for splitting into training set and testing set
     x_train, x_test, y_train, y_test = train_test_split(features, output, test_size=test_population)
-    performSVMBaseLine(x_train, x_test, y_train, y_test)
-    performGridSearch(x_train, x_test, y_train, y_test)
+    #performSVMBaseLine(x_train, x_test, y_train, y_test)
+    #performGridSearch(x_train, x_test, y_train, y_test)
     performSVNTuned(x_train, x_test, y_train, y_test)
